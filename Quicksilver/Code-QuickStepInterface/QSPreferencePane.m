@@ -127,7 +127,42 @@
 - (void)paneWillMoveToWindow:(NSWindow *)newWindow {}
 - (void)paneDidMoveToWindow:(NSWindow *)newWindow {}
 
-- (void)mainViewDidLoad {}
+- (void)mainViewDidLoad {
+    if ([[self mainNibBundle] isEqual:[NSBundle mainBundle]]) {
+        // we only want to play with plugins prefs (i.e. preferences from outside of the main app)
+        return;
+    }
+    [_mainView setAutoresizesSubviews:NO];
+    NSRect viewFrame = [_mainView frame];
+    [_mainView setFrame:NSMakeRect(0,0, NSWidth(viewFrame), NSHeight(viewFrame)+20)];
+    // for plugins preferences, add a title to the pane, and a button directly to the help docs
+    if ([_info objectForKey:@"type"] == nil) {
+        // create the name field
+        NSTextField *nameField = [[NSTextField alloc] initWithFrame:NSMakeRect(10, NSHeight(viewFrame)-6, _mainView.frame.size.width, 20)];
+        [nameField setStringValue:[_info objectForKey:@"name"]];
+        [nameField setBezeled:NO];
+        [nameField setDrawsBackground:NO];
+        [nameField setEditable:NO];
+        [nameField setSelectable:NO];
+        [_mainView addSubview:nameField];
+        [nameField release];
+        
+        // create a help button
+        NSButton *helpButton = [[NSButton alloc] initWithFrame:NSMakeRect(NSWidth(viewFrame)-25, NSHeight(viewFrame)-10, 25, 25)];
+        [helpButton setTitle:nil];
+        [helpButton setBezelStyle:NSHelpButtonBezelStyle];
+        [helpButton setTarget:self];
+        [helpButton setAction:@selector(showPluginHelp:)];
+        [_mainView addSubview:helpButton];
+        [helpButton release];
+    }
+    
+}
+
+-(IBAction)showPluginHelp:(id)sender {
+    // show theplugin help pane
+}
+
 - (void)willSelect {}
 - (void)didSelect {}
 
